@@ -1,0 +1,14 @@
+name: "Pueba de CI"
+on: 
+  push:
+    branches: [main]
+jobs: 
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Descargar còdigo
+      uses: actions/checkou@v4
+    - name: instalar python
+      uses: actions/setup-python@v6
+      with:
+        python-version: '3.13' 
