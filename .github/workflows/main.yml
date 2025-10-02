@@ -1,14 +1,47 @@
-name: "Pueba de CI"
-on: 
+# Nombre que aparece en GitHub Actions
+name: Prueba de python
+
+on:
   push:
-    branches: [main]
-jobs: 
+    branches: [ main ]
+
+jobs:
   test:
+    name: Pruebas y Cobertura
     runs-on: ubuntu-latest
+    
     steps:
-    - name: Descargar còdigo
-      uses: actions/checkou@v4
-    - name: instalar python
-      uses: actions/setup-python@v6
+    # Paso 1: Descargar el código del repositorio
+    - name: Descargar código
+      uses: actions/checkout@v4
+    
+    # Paso 2: Instalar Python 3.10
+    - name: Instalar Python
+      uses: actions/setup-python@v4
       with:
-        python-version: '3.13' 
+        python-version: '3.10'
+    
+    # Paso 3: Instalar dependencias
+    - name: Instalar dependencias
+      run: |
+        # Actualizar pip
+        python -m pip install --upgrade pip
+        # Instalar herramientas básicas (incluye pytest-cov)
+        pip install flake8 pytest pytest-cov
+        # Instalar dependencias del proyecto si existen
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+    
+    # Paso 4: Verificar sintaxis y estilo básico
+    - name: Verificar código con flake8
+      run: |
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+    
+    # Paso 5: Ejecutar tests con cobertura
+    - name: Ejecutar tests
+      run: pytest --cov --cov-branch --cov-report=xml
+    
+    # Paso 6: Subir reporte a Codecov
+    - name: Subir cobertura a Codecov
+      uses: codecov/codecov-action@v5
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
